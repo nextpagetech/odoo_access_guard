@@ -1,0 +1,601 @@
+<odoo>
+    <data>
+        <record id="view_access_guard_management_tree" model="ir.ui.view">
+            <field name="name">access.guard.management.tree</field>
+            <field name="model">access.guard.management</field>
+            <field name="arch" type="xml">
+                <list string="Access Rules">
+                    <field name="name"/>
+                    <field name="user_ids" widget="many2many_tags" optional="show"/>
+                    <field name="group_ids" widget="many2many_tags" optional="hide"/>
+                    <field name="apply_by_group" optional="hide"/>
+                    <field name="company_ids" widget="many2many_tags" optional="hide"/>
+                    <field name="rule_count" string="Menu Rules"/>
+                    <field name="active"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_access_guard_management_form" model="ir.ui.view">
+            <field name="name">access.guard.management.form</field>
+            <field name="model">access.guard.management</field>
+            <field name="arch" type="xml">
+                <form string="Access Rule">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-toggle-on">
+                                <field name="active" widget="boolean_toggle" readonly="1"/>
+                                <span class="o_stat_info">Active</span>
+                            </button>
+                            <button name="action_view_rules"
+                                    type="object"
+                                    class="oe_stat_button">
+                                <field name="rule_count" widget="statinfo" string="Menu Rules"/>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name" required="1"/>
+                                <field name="apply_by_group"/>
+                                <field name="read_only"/>
+                                <field name="apply_without_company"/>
+                            </group>
+                            <group>
+                                <field name="user_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="group_ids" widget="many2many_tags" options="{'no_create': True}" invisible="not apply_by_group"/>
+                                <field name="default_internal_user"/>
+                                <field name="default_portal_user"/>
+                                <field name="disable_developer_mode"/>
+                                <field name="company_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Hide Menu">
+                                <group>
+                                    <field name="menu_ids"
+                                           widget="many2many_tags"
+                                           options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"
+                                           context="{'access_guard_skip_guard': True}"
+                                           string="Restricted Menus"/>
+                                </group>
+                                <field name="menu_line_ids" nolabel="1">
+                                    <list editable="bottom" create="0" delete="1" string="Hidden Menus">
+                                        <field name="sequence"/>
+                                        <field name="menu_id" options="{'no_create': True}" required="1"/>
+                                    </list>
+                                    <form string="Hidden Menu">
+                                        <group>
+                                            <field name="sequence"/>
+                                            <field name="menu_id" options="{'no_create': True}" required="1"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Model Access">
+                                <field name="model_rule_ids" nolabel="1">
+                                    <list string="Model Rules" editable="bottom">
+                                        <field name="sequence" optional="hide"/>
+                                        <field name="model_id" options="{'no_create': True}" required="1"/>
+                                        <field name="report_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                        <field name="action_ids" widget="many2many_tags" options="{'no_create': True}" />
+                                        <field name="window_action_ids" widget="many2many_tags" options="{'no_create': True}" />
+                                        <field name="hide_view_mode_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                        <field name="view_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                        <field name="hide_create" widget="boolean_toggle"/>
+                                        <field name="hide_edit" widget="boolean_toggle"/>
+                                        <field name="hide_delete" widget="boolean_toggle"/>
+                                        <field name="hide_archive" widget="boolean_toggle"/>
+                                        <field name="hide_duplicate" widget="boolean_toggle"/>
+                                        <field name="hide_import" widget="boolean_toggle"/>
+                                        <field name="hide_export" widget="boolean_toggle"/>
+                                        <field name="hide_spreadsheet" widget="boolean_toggle"/>
+                                    </list>
+                                    <form string="Model Rule">
+                                        <group>
+                                            <field name="model_id" options="{'no_create': True}" required="1"/>
+                                            <field name="report_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                            <field name="action_ids" widget="many2many_tags" options="{'no_create': True}" />
+                                            <field name="window_action_ids" widget="many2many_tags" options="{'no_create': True}" />
+                                            <field name="hide_view_mode_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                            <field name="view_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                        </group>
+                                        <group>
+                                            <field name="hide_create" widget="boolean_toggle"/>
+                                            <field name="hide_edit" widget="boolean_toggle"/>
+                                            <field name="hide_delete" widget="boolean_toggle"/>
+                                            <field name="hide_archive" widget="boolean_toggle"/>
+                                            <field name="hide_duplicate" widget="boolean_toggle"/>
+                                            <field name="hide_import" widget="boolean_toggle"/>
+                                            <field name="hide_export" widget="boolean_toggle"/>
+                                            <field name="hide_spreadsheet" widget="boolean_toggle"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Field Access">
+                                <field name="field_rule_ids" nolabel="1">
+                                    <list string="Field Rules" editable="bottom">
+                                        <field name="sequence" optional="hide"/>
+                                        <field name="model_id" options="{'no_create': True}" required="1"/>
+                                        <field name="field_ids"
+                                               widget="many2many_tags"
+                                               options="{'no_create': True}"
+                                               domain="[('model_id', '=', model_id)]"/>
+                                        <field name="invisible" widget="boolean_toggle"/>
+                                        <field name="read_only" widget="boolean_toggle"/>
+                                        <field name="required" widget="boolean_toggle"/>
+                                        <field name="remove_create_option" widget="boolean_toggle"/>
+                                        <field name="remove_edit_option" widget="boolean_toggle"/>
+                                        <field name="remove_external_link" widget="boolean_toggle"/>
+                                    </list>
+                                    <form string="Field Rule">
+                                        <group>
+                                            <field name="model_id" options="{'no_create': True}" required="1"/>
+                                            <field name="field_ids"
+                                                   widget="many2many_tags"
+                                                   options="{'no_create': True}"
+                                                   domain="[('model_id', '=', model_id)]"/>
+                                        </group>
+                                        <group>
+                                            <field name="invisible" widget="boolean_toggle"/>
+                                            <field name="read_only" widget="boolean_toggle"/>
+                                            <field name="required" widget="boolean_toggle"/>
+                                            <field name="remove_create_option" widget="boolean_toggle"/>
+                                            <field name="remove_edit_option" widget="boolean_toggle"/>
+                                            <field name="remove_external_link" widget="boolean_toggle"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Field Conditional Access">
+                                <field name="field_conditional_ids"
+                                       nolabel="1"
+                                       mode="list,form"
+                                       context="{'default_management_id': id}"
+                                       options="{'no_quick_create': True, 'no_create_edit': False}">
+                                    <list string="Field Conditional Rules" open_form_view="True">
+                                        <field name="sequence" optional="hide"/>
+                                        <field name="model_id" options="{'no_create': True}" required="1"/>
+                                        <field name="attr_type" string="Attrs Type"/>
+                                        <field name="attr_field_ids" string="Attrs On Fields" widget="many2many_tags" options="{'no_create': True}"/>
+                                        <field name="attr_button_ids" string="Attrs On Buttons" widget="many2many_tags" options="{'no_create': True}"/>
+                                        <field name="attrs_domain_display" string="Attrs"/>
+                                        <field name="domain_field_id" string="Domain On Field" options="{'no_create': True}"/>
+                                        <field name="domain_expression_display" string="Domain"/>
+                                    </list>
+                                    <form string="Field Conditional Access">
+                                        <sheet>
+                                            <group>
+                                                <field name="model_id" options="{'no_create': True}" required="1"/>
+                                                <field name="apply_attrs" widget="boolean_toggle"/>
+                                                <field name="apply_domain" widget="boolean_toggle"/>
+                                                <field name="model_name" invisible="1"/>
+                                            </group>
+                                            <notebook>
+                                                <page string="Attrs" attrs="{'invisible': [('apply_attrs', '=', False)]}">
+                                                    <group>
+                                                        <field name="attr_field_ids"
+                                                               options="{'no_create': True}"
+                                                               domain="[('model_id', '=', model_id)]"/>
+                                                        <field name="attr_button_ids"
+                                                               options="{'no_create': True}"
+                                                               domain="[('model_id', '=', model_id), ('type', 'in', ('button', 'action_button', 'smart_button'))]"/>
+                                                        <field name="attr_type"
+                                                               widget="radio"
+                                                               attrs="{'required': [('apply_attrs', '=', True)]}"/>
+                                                        <field name="attrs_domain"
+                                                               widget="domain"
+                                                               options="{'model': 'model_name'}"
+                                                               attrs="{'required': [('apply_attrs', '=', True)], 'readonly': [('apply_attrs', '=', False)]}"/>
+                                                    </group>
+                                                </page>
+                                                <page string="Field Domain" attrs="{'invisible': [('apply_domain', '=', False)]}">
+                                                    <group>
+                                                        <field name="domain_field_id"
+                                                               options="{'no_create': True}"
+                                                               domain="[('model_id', '=', model_id), ('ttype', 'in', ('many2one', 'one2many', 'many2many'))]"
+                                                               attrs="{'required': [('apply_domain', '=', True)]}"/>
+                                                        <field name="domain_expression"
+                                                               widget="domain"
+                                                               options="{'model': 'model_name'}"
+                                                               attrs="{'required': [('apply_domain', '=', True)], 'readonly': [('apply_domain', '=', False)]}"/>
+                                                    </group>
+                                                </page>
+                                            </notebook>
+                                        <div class="alert alert-info mt-3" role="status">
+                                                <i class="fa fa-info-circle me-2" role="img" aria-hidden="true"/>
+                                                <span>
+                                                    Use these rules to apply dynamic attrs or domains on specific fields for the selected model.
+                                                </span>
+                                            </div>
+                                        </sheet>
+                                    </form>
+                                </field>
+                                <div class="alert alert-info mt-3" role="status">
+                                    <i class="fa fa-info-circle me-2" role="img" aria-hidden="true"/>
+                                    <span>You can apply attrs and domain conditions to any field of the selected model for the targeted users.</span>
+                                </div>
+                            </page>
+                            <page string="Domain Access">
+                                <field name="domain_rule_ids" nolabel="1" context="{'default_management_id': id}">
+                                    <list string="Domain Access Rules">
+                                        <field name="model_id" options="{'no_create': True}" required="1"/>
+                                        <field name="domain_expression_display" string="Filter"/>
+                                        <field name="soft_restrict"/>
+                                        <field name="apply_relational_fields"/>
+                                        <field name="perm_read"/>
+                                        <field name="perm_create"/>
+                                        <field name="perm_write"/>
+                                        <field name="perm_delete"/>
+                                    </list>
+                                    <form string="Domain Access Rule">
+                                        <group>
+                                            <group>
+                                                <field name="sequence"/>
+                                                <field name="model_id" options="{'no_create': True}" required="1"/>
+                                                <field name="model_name" readonly="1"/>
+                                            </group>
+                                            <group>
+                                                <field name="soft_restrict"/>
+                                                <field name="apply_relational_fields"/>
+                                            </group>
+                                        </group>
+                                        <group string="Permissions" col="4">
+                                            <field name="perm_read"/>
+                                            <field name="perm_create"/>
+                                            <field name="perm_write"/>
+                                            <field name="perm_delete"/>
+                                        </group>
+                                        <group string="Filter">
+                                            <field name="apply_filter"/>
+                                            <field name="domain_expression"
+                                                   widget="access_guard_domain"
+                                                   options="{'model': 'model_name'}"
+                                                   attrs="{'required': [('apply_filter', '=', True)], 'readonly': [('apply_filter', '=', False)]}"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Button/Tab Access">
+                                <field name="ui_rule_ids" nolabel="1" context="{'default_management_id': id}">
+                                    <list string="Button/Tab Rules" editable="bottom">
+                                        <field name="sequence" optional="hide"/>
+                                        <field name="model_id" options="{'no_create': True}" required="1"/>
+                                        <field name="button_element_ids"
+                                               string="Hide Server Buttons"
+                                               widget="many2many_tags"
+                                               options="{'no_create': True}"
+                                               domain="[('model_id', '=', model_id), ('type', '=', 'button')]"
+                                               context="{'default_model_id': model_id, 'default_type': 'button', 'search_default_model_id': model_id, 'search_default_type': 'button', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['button']}"/>
+                                        <field name="action_button_element_ids"
+                                               string="Hide Window Buttons"
+                                               widget="many2many_tags"
+                                               options="{'no_create': True}"
+                                               domain="[('model_id', '=', model_id), ('type', '=', 'action_button')]"
+                                               context="{'default_model_id': model_id, 'default_type': 'action_button', 'search_default_model_id': model_id, 'search_default_type': 'action_button', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['action_button']}"/>
+                                        <field name="smart_button_element_ids"
+                                               string="Hide Smart Buttons"
+                                               widget="many2many_tags"
+                                               options="{'no_create': True}"
+                                               domain="[('model_id', '=', model_id), ('type', '=', 'smart_button')]"
+                                               context="{'default_model_id': model_id, 'default_type': 'smart_button', 'search_default_model_id': model_id, 'search_default_type': 'smart_button', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['smart_button']}"/>
+                                        <field name="tab_element_ids"
+                                                string="Hide Tab/Page"
+                                                widget="many2many_tags"
+                                               options="{'no_create': True}"
+                                                domain="[('model_id', '=', model_id), ('type', '=', 'page')]"
+                                               context="{'default_model_id': model_id, 'default_type': 'page', 'search_default_model_id': model_id, 'search_default_type': 'page', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['page']}"/>
+                                        <field name="kanban_link_element_ids"
+                                                string="Hide Kanban Link"
+                                                widget="many2many_tags"
+                                               options="{'no_create': True}"
+                                               domain="[('model_id', '=', model_id), ('type', '=', 'kanban_link')]"
+                                               context="{'default_model_id': model_id, 'default_type': 'kanban_link', 'search_default_model_id': model_id, 'search_default_type': 'kanban_link', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['kanban_link']}"/>
+                                    </list>
+                                    <form string="Button/Tab Access">
+                                        <group>
+                                            <group>
+                                                <field name="sequence"/>
+                                                <field name="model_id" options="{'no_create': True}" required="1"/>
+                                            </group>
+                                            <notebook>
+                                                <page string="Buttons">
+                                                   <field name="button_element_ids"
+                                                           widget="many2many_tags"
+                                                           options="{'no_create': True}"
+                                                           domain="[('model_id', '=', model_id), ('type', '=', 'button')]"
+                                                           context="{'default_model_id': model_id, 'default_type': 'button', 'search_default_model_id': model_id, 'search_default_type': 'button', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['button']}"/>
+                                                </page>
+                                                <page string="Window Buttons">
+                                                   <field name="action_button_element_ids"
+                                                           widget="many2many_tags"
+                                                           options="{'no_create': True}"
+                                                           domain="[('model_id', '=', model_id), ('type', '=', 'action_button')]"
+                                                           context="{'default_model_id': model_id, 'default_type': 'action_button', 'search_default_model_id': model_id, 'search_default_type': 'action_button', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['action_button']}"/>
+                                                </page>
+                                                <page string="Smart Buttons">
+                                                   <field name="smart_button_element_ids"
+                                                           widget="many2many_tags"
+                                                           options="{'no_create': True}"
+                                                           domain="[('model_id', '=', model_id), ('type', '=', 'smart_button')]"
+                                                           context="{'default_model_id': model_id, 'default_type': 'smart_button', 'search_default_model_id': model_id, 'search_default_type': 'smart_button', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['smart_button']}"/>
+                                                </page>
+                                                <page string="Tabs/Pages">
+                                                   <field name="tab_element_ids"
+                                                           widget="many2many_tags"
+                                                           options="{'no_create': True}"
+                                                           domain="[('model_id', '=', model_id), ('type', '=', 'page')]"
+                                                           context="{'default_model_id': model_id, 'default_type': 'page', 'search_default_model_id': model_id, 'search_default_type': 'page', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['page']}"/>
+                                                </page>
+                                                <page string="Kanban Links">
+                                                   <field name="kanban_link_element_ids"
+                                                           widget="many2many_tags"
+                                                           options="{'no_create': True}"
+                                                           domain="[('model_id', '=', model_id), ('type', '=', 'kanban_link')]"
+                                                           context="{'default_model_id': model_id, 'default_type': 'kanban_link', 'search_default_model_id': model_id, 'search_default_type': 'kanban_link', 'access_guard_model_ids': [model_id], 'access_guard_element_types': ['kanban_link']}"/>
+                                                </page>
+                                            </notebook>
+                                        </group>
+                                        <div class="alert alert-info mt-2" role="status" aria-live="polite">
+                                            <p class="mb-1">Select the model first, then choose which buttons, smart buttons, tabs/pages, and kanban quick links should be hidden.</p>
+                                            <p class="mb-0">Discovered elements are available as tags; create custom entries when working with customised views.</p>
+                                        </div>
+                                    </form>
+                                    
+                                </field>
+                            </page>
+                            <page string="Search Panel Access">
+                                <field name="search_panel_rule_ids" nolabel="1" context="{'default_management_id': id}">
+                                    <list string="Search Panel Rules" editable="bottom">
+                                        <field name="sequence" optional="hide"/>
+                                        <field name="model_id" options="{'no_create': True}" required="1"/>
+                                        <field name="hide_search_panel" widget="boolean_toggle"/>
+                                        <field name="filter_item_ids"
+                                               widget="many2many_tags"
+                                               string="Hide Filters"
+                                               options="{'no_create': True}"/>
+                                        <field name="group_item_ids"
+                                               widget="many2many_tags"
+                                               string="Hide Groups"
+                                               options="{'no_create': True}"/>
+                                        <field name="hide_custom_filter" widget="boolean_toggle"/>
+                                        <field name="hide_custom_group" widget="boolean_toggle"/>
+                                        <field name="hide_delete_favorite" widget="boolean_toggle"/>
+                                    </list>
+                                    <form string="Search Panel Rule">
+                                        <group>
+                                            <field name="model_id" options="{'no_create': True}" required="1"/>
+                                            <field name="hide_search_panel" widget="boolean_toggle"/>
+                                        </group>
+                                        <group>
+                                            <field name="filter_item_ids"
+                                                   widget="many2many_tags"
+                                                   options="{'no_create': True}"
+                                                   context="{'default_model_id': model_id, 'search_default_type': 'filter'}"/>
+                                            <field name="group_item_ids"
+                                                   widget="many2many_tags"
+                                                   options="{'no_create': True}"
+                                                   context="{'default_model_id': model_id, 'search_default_type': 'group'}"/>
+                                        </group>
+                                        <group>
+                                            <field name="hide_custom_filter" widget="boolean_toggle"/>
+                                            <field name="hide_custom_group" widget="boolean_toggle"/>
+                                            <field name="hide_delete_favorite" widget="boolean_toggle"/>
+                                        </group>
+                                        <div class="alert alert-info mt-3" role="status">
+                                            <i class="fa fa-info-circle me-2" role="img" aria-hidden="true"/>
+                                            <span>
+                                                Choose which search panel sections, custom filter/group options, and favorite actions are available for this model.
+                                            </span>
+                                        </div>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Chatter">
+                                <field name="chatter_rule_ids" nolabel="1" context="{'default_management_id': id}">
+                                    <list string="Chatter Rules" editable="bottom">
+                                        <field name="sequence" optional="hide"/>
+                                        <field name="model_id" options="{'no_create': True}" required="1"/>
+                                        <field name="hide_chatter" widget="boolean_toggle"/>
+                                        <field name="hide_send_message" widget="boolean_toggle"/>
+                                        <field name="hide_log_note" widget="boolean_toggle"/>
+                                        <field name="hide_schedule_activity" widget="boolean_toggle"/>
+                                    </list>
+                                    <form string="Chatter Rule">
+                                        <group>
+                                            <field name="model_id" options="{'no_create': True}" required="1"/>
+                                            <field name="sequence"/>
+                                        </group>
+                                        <group string="Hide">
+                                            <field name="hide_chatter" widget="boolean_toggle"/>
+                                            <field name="hide_send_message" widget="boolean_toggle"/>
+                                            <field name="hide_log_note" widget="boolean_toggle"/>
+                                            <field name="hide_schedule_activity" widget="boolean_toggle"/>
+                                        </group>
+                                    </form>
+                                </field>
+                                <div class="o_form_label">
+                                    Hide the chatter entirely or only specific buttons like 'Send message', 'Log note', and 'Activities'.
+                                </div>
+                            </page>
+                            <page string="Global">
+                                <group col="2">
+                                    <group>
+                                        <group string="Chatter">
+                                            <field name="global_hide_chatter" widget="boolean_toggle" help="Hide the chatter for every model assigned to this rule."/>
+                                            <field name="global_hide_send_message" widget="boolean_toggle" help="Hide the Send message button in chatter everywhere."/>
+                                            <field name="global_hide_log_note" widget="boolean_toggle" help="Hide the Log note button in chatter everywhere."/>
+                                            <field name="global_hide_schedule_activity" widget="boolean_toggle" help="Hide the Schedule activity button and activity list in chatter everywhere."/>
+                                        </group>
+                                        <group string="Search Panel" class="mt-3">
+                                            <field name="global_hide_search_panel" widget="boolean_toggle" help="Hide the entire search panel and its toggle button."/>
+                                            <field name="global_hide_custom_filter" widget="boolean_toggle" help="Prevent users from creating custom filters."/>
+                                            <field name="global_hide_custom_group" widget="boolean_toggle" help="Prevent users from creating custom group-bys."/>
+                                            <field name="global_hide_delete_favorite" widget="boolean_toggle" help="Hide the delete icon from favorite filters."/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <group string="Import &amp; Export">
+                                            <field name="global_hide_import" widget="boolean_toggle" help="Disable the Import feature in every list view."/>
+                                            <field name="global_hide_export" widget="boolean_toggle" help="Disable the Export feature in every list view."/>
+                                            <field name="global_hide_spreadsheet" widget="boolean_toggle" help="Disable the Spreadsheet feature in every list view."/>
+                                            <field name="global_hide_add_property" widget="boolean_toggle" help="Remove the Add properties action from all form views."/>
+                                        </group>
+                                        <group string="Others" class="mt-3">
+                                            <field name="global_disable_login" widget="boolean_toggle" help="Prevent the targeted users from logging into Odoo."/>
+                                        </group>
+                                    </group>
+                                </group>
+                                <div class="alert alert-info mt-3" role="status">
+                                    <i class="fa fa-info-circle me-2"/>
+                                    <span>
+                                        Use these options to apply access guard rules globally across all models for the selected users or groups.
+                                    </span>
+                                </div>
+                            </page>
+                            <page string="Overview Access">
+                                <group>
+                                    <group>
+                                        <field name="overview_mode" widget="radio"/>
+                                        <field name="overview_picking_type_ids"
+                                               widget="many2many_tags"
+                                               options="{'no_create': True}"
+                                               context="{'access_guard_skip_guard': True}"
+                                               string="Operation Types"/>
+                                    </group>
+                                    <div class="alert alert-info" role="status">
+                                        <span>
+                                            Select Inventory Overview cards (operation types) to hide or to be the only ones shown
+                                            for the targeted users. This only affects the Inventory Overview kanban; it does not
+                                            restrict backend operations or other views.
+                                        </span>
+                                    </div>
+                                </group>
+                            </page>
+                            <page string="ACL">
+                                <field name="acl_rule_ids" nolabel="1">
+                                    <list string="ACL Rules" editable="bottom">
+                                        <field name="model_id" options="{'no_create': True}" required="1"/>
+                                        <field name="group_id" options="{'no_create': True}" required="1"/>
+                                        <field name="perm_read" widget="boolean_toggle"/>
+                                        <field name="perm_write" widget="boolean_toggle"/>
+                                        <field name="perm_create" widget="boolean_toggle"/>
+                                        <field name="perm_unlink" widget="boolean_toggle"/>
+                                    </list>
+                                    <form string="ACL Rule">
+                                        <group>
+                                            <field name="model_id" options="{'no_create': True}" required="1"/>
+                                            <field name="group_id" options="{'no_create': True}" required="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="perm_read" widget="boolean_toggle"/>
+                                            <field name="perm_write" widget="boolean_toggle"/>
+                                            <field name="perm_create" widget="boolean_toggle"/>
+                                            <field name="perm_unlink" widget="boolean_toggle"/>
+                                        </group>
+                                        <group>
+                                            <field name="access_id" readonly="1"/>
+                                        </group>
+                                        <div class="alert alert-info mt-2" role="status">
+                                            <span>
+                                                This creates or updates an ir.model.access entry for the selected group and model.
+                                                ACLs grant baseline access; use other Access Guard tabs to further restrict UI and records.
+                                            </span>
+                                        </div>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_access_guard_management_menu_tree" model="ir.ui.view">
+            <field name="name">access.guard.management.menu.tree</field>
+            <field name="model">access.guard.management.menu</field>
+            <field name="arch" type="xml">
+                <list string="Hidden Menus">
+                    <field name="sequence"/>
+                    <field name="menu_id"/>
+                    <field name="management_id"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_access_guard_management_menu_form" model="ir.ui.view">
+            <field name="name">access.guard.management.menu.form</field>
+            <field name="model">access.guard.management.menu</field>
+            <field name="arch" type="xml">
+                <form string="Hidden Menu">
+                    <sheet>
+                        <group>
+                            <field name="management_id" options="{'no_create': True}"/>
+                            <field name="sequence"/>
+                            <field name="menu_id" options="{'no_create': True}" required="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_access_guard_management" model="ir.actions.act_window">
+            <field name="name">Access Rules</field>
+            <field name="res_model">access.guard.management</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p>Create user or group specific rules to hide menus.</p>
+            </field>
+        </record>
+
+        <menuitem id="menu_access_guard_root"
+                  name="Access Guard"
+                  sequence="30"
+                  groups="npt_access_guard.group_access_guard_manager"/>
+
+        <menuitem id="menu_access_guard_management"
+                  name="Access Rules"
+                  parent="menu_access_guard_root"
+                  action="action_access_guard_management"
+                  sequence="10"
+                  groups="npt_access_guard.group_access_guard_manager"/>
+    
+        <record id="view_access_guard_menu_add_wizard" model="ir.ui.view">
+            <field name="name">access.guard.menu.add.wizard.form</field>
+            <field name="model">access.guard.menu.add.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Add Menus">
+                    <group>
+                        <field name="menu_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}"/>
+                    </group>
+                    <footer>
+                        <button name="action_add_menus" string="Add" type="object" class="btn-primary"/>
+                        <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_access_guard_menu_add_wizard" model="ir.actions.act_window">
+            <field name="name">Add Menus</field>
+            <field name="res_model">access.guard.menu.add.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="access_guard_ir_ui_menu_search_inherit" model="ir.ui.view">
+            <field name="name">ir.ui.menu.search.access.guard</field>
+            <field name="model">ir.ui.menu</field>
+            <field name="inherit_id" ref="base.edit_menu_access_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <filter name="access_guard_root" string="Application" context="{'group_by': 'root_id'}"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="npt_access_guard.DomainAccessField" t-inherit="web.DomainField" t-inherit-mode="primary">
+        <xpath expr="//DomainSelector" position="attributes">
+            <attribute name="isDebugMode">true</attribute>
+        </xpath>
+        <xpath expr="//div[contains(@class, 'o_field_domain_panel')]//t[@t-if='state.isValid']" position="replace">
+            <t t-if="state.isValid">
+                <span t-if="isDynamicDomain()" class="text-success" role="status">Valid domain</span>
+                <button t-else="" class="btn btn-sm btn-link o_domain_show_selection_button" type="button" t-on-click.stop="onButtonClick">
+                    <t t-esc="state.recordCount"/> record(s)
+                </button>
+            </t>
+        </xpath>
+    </t>
+</templates>

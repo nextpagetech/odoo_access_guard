@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="access_guard_templates" xml:space="preserve">
+    <t t-name="npt_access_guard.AccessGuardDashboard" owl="1">
+        <div class="o_access_guard_dashboard o_view_nocontent">
+            <div class="o_nocontent_help">
+                <span class="o_nocontent_icon fa fa-shield" aria-hidden="true"></span>
+                <h2>Access Studio</h2>
+                <p>
+                    Manage access rules from a unified workspace. This dashboard is a placeholder
+                    until the feature is implemented.
+                </p>
+                <p class="text-muted">
+                    Use the side menus to explore future policy and configuration sections.
+                </p>
+            </div>
+        </div>
+    </t>
+</templates>

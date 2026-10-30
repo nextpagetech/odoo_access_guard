@@ -1,0 +1,38 @@
+.o-mail-Chatter.o_access_guard_chatter_hidden {
+    display: none !important;
+}
+
+.o-mail-Chatter.o_access_guard_hide_send_message .o-mail-Chatter-sendMessage {
+    display: none !important;
+}
+
+.o-mail-Chatter.o_access_guard_hide_log_note .o-mail-Chatter-logNote {
+    display: none !important;
+}
+
+.o-mail-Chatter.o_access_guard_hide_schedule_activity .o-mail-Chatter-activity,
+.o-mail-Chatter.o_access_guard_hide_schedule_activity .o-mail-ActivityList {
+    display: none !important;
+}
+
+.o_access_guard_hidden {
+    display: none !important;
+}
+
+body.o_access_guard_hide_search_panel .o_search_panel,
+body.o_access_guard_hide_search_panel .o_searchview_dropdown_toggler,
+body.o_access_guard_hide_search_panel .o_search_bar_menu {
+    display: none !important;
+}
+
+body.o_access_guard_hide_custom_filter .o_add_custom_filter {
+    display: none !important;
+}
+
+body.o_access_guard_hide_custom_group .o_add_custom_group_menu {
+    display: none !important;
+}
+
+body.o_access_guard_hide_favorite_delete .o_favorite_menu .fa-trash-o {
+    display: none !important;
+}
